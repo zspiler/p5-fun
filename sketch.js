@@ -33,16 +33,15 @@ function draw() {
 }
 
 function step(x = 50, y = 50) {
-  const randomColor = pallete[Math.floor(Math.random() * pallete.length)]
-  const { r, g, b } = hexToRgb(randomColor)
 
+  const { r, g, b } = hexToRgb(pallete[Math.floor(y) % pallete.length])
+
+  fill(r, g, b)
   stroke(255, 0, 0)
 
-  // const { r, g, b } = randomRgb()
-  // console.log(r, g, b);
-  // stroke(r, g, b)
-  // fill(r, g, b);
-  rect(sin(time + y) * x + y, y, 1, 1);
+  rect(sin(time + y) * x + y, y, 1, 1); // dots
+
+  rect(sin(time + y) * x + y, y, 10, 100); // skyscrapers
 }
 
 
