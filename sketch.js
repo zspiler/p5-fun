@@ -1,23 +1,23 @@
 import { generatePalette, hexToRgb, randomHex } from './colors.js'
 
-let slider1;
+let sizeSlider;
+let speedSlider;
 
 let pallete = []
 
 function setup() {
   createCanvas(1000, 1000);
 
-  const slider1Default = 100
-  slider1 = createSlider(0, 1000, slider1Default);
-  slider1.position(20, 900);
+  sizeSlider = createSlider(0, 1000, 200);
+  sizeSlider.position(20, 900);
+
+  speedSlider = createSlider(0, 0.01, 0.001, 0.0001);
+  speedSlider.position(20, 920);
 
   pallete = generatePalette(randomHex())
 }
 
 let time = 0
-
-let speed = 0.0001
-
 
 
 function draw() {
@@ -26,10 +26,10 @@ function draw() {
   drawPallete()
 
   for (let y = 0; y < 1000; y += 0.1) {
-    step(slider1.value(), y)
+    step(sizeSlider.value(), y)
   }
 
-  time += speed
+  time += speedSlider.value()
 
   drawSliderTexts()
 }
@@ -43,7 +43,8 @@ function step(x = 50, y = 50) {
 
   // rect(sin(time + y) * x + y, y, 1, 1); // dots
   // rect(sin(time + y) * x + y, y, 10, 100); // skyscrapers
-  rect(tan(time + y) * x + y, y, 10, 100); // skyscrapers
+  // rect(tan(time + y) * x + y, y, 10, 100); // tan!
+  rect(tan(time + y) * x + y, y, 1, 1); // tan!
 }
 
 
@@ -70,5 +71,6 @@ function drawPallete() {
 function drawSliderTexts() {
   stroke(255)
   fill(255)
-  text('SIZE', slider1.x * 2 + slider1.width, slider1.y + slider1.height - 2);
+  text(`SIZE ${sizeSlider.value()}`, sizeSlider.x * 2 + sizeSlider.width, sizeSlider.y + sizeSlider.height - 2);
+  text(`SPEED ${speedSlider.value()}`, speedSlider.x * 2 + speedSlider.width, speedSlider.y + speedSlider.height - 2);
 }
