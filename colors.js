@@ -1,27 +1,29 @@
+
+
+
 function getComplementaryColor(color) {
-    // Convert the color to HSL (Hue, Saturation, Lightness) format
+    const MIN_LIGHTNESS = 0.6;
+
     let hsl = hexToHSL(color);
 
-    // Calculate the complementary hue by adding 180 degrees (or subtracting 180 if over 360)
     let complementaryHue = (hsl.h + 180) % 360;
 
-    // Convert the complementary hue back to RGB format
-    let complementaryRGB = hslToRGB({ h: complementaryHue, s: hsl.s, l: hsl.l });
+    let complementaryRGB = hslToRGB({ h: complementaryHue, s: hsl.s, l: Math.max(hsl.l, MIN_LIGHTNESS) });
 
     return rgbToHex(complementaryRGB);
 }
 
 function getAnalogousColors(color) {
+    const MIN_LIGHTNESS = 0.4;
+
     let hsl = hexToHSL(color);
     let analogousColors = [];
 
-    // Generate two analogous colors by shifting the hue slightly
     let hue1 = (hsl.h + 30) % 360;
     let hue2 = (hsl.h - 30 + 360) % 360;
 
-    // Convert the hues back to RGB format
-    let rgb1 = hslToRGB({ h: hue1, s: hsl.s, l: hsl.l });
-    let rgb2 = hslToRGB({ h: hue2, s: hsl.s, l: hsl.l });
+    let rgb1 = hslToRGB({ h: hue1, s: hsl.s, l: Math.max(hsl.l, MIN_LIGHTNESS) });
+    let rgb2 = hslToRGB({ h: hue2, s: hsl.s, l: Math.max(hsl.l, MIN_LIGHTNESS) });
 
     analogousColors.push(rgbToHex(rgb1));
     analogousColors.push(rgbToHex(rgb2));
