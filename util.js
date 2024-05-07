@@ -1,5 +1,3 @@
-
-
 export function getRandomUnicodeCharacter() {
     return Array.from(
         { length: 1 }, () => String.fromCharCode(Math.floor(Math.random() * (65536)))

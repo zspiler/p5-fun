@@ -1,5 +1,6 @@
 import { generatePalette, hexToRgb, randomHex } from './colors.js'
 import { getRandomEmoji, getRandomUnicodeCharacter } from './util.js'
+import { record } from './p5Util.js'
 
 const SCREEN_SIZE = 1000
 
@@ -13,8 +14,9 @@ let modeSelect;
 let resetButton;
 
 let pallete = []
+let chunks = [] // for recording
 
-const SHOW_MENU = true
+let SHOW_MENU = true
 
 const modes = {
   Dots: 'Dots',
@@ -27,7 +29,6 @@ const modes = {
 function createSliderWithLabel(min, max, defaultValue, step, labelPrefix, xPos, yPos) {
   const slider = createSlider(min, max, getItem(labelPrefix) ?? defaultValue, step);
   slider.changed(() => {
-    console.log(`slider ${labelPrefix}`);
     storeItem(labelPrefix, slider.value());
     label.html(`${labelPrefix.toUpperCase()} ${slider.value()}`);
   });
@@ -78,9 +79,9 @@ function setup() {
   createCanvas(SCREEN_SIZE, SCREEN_SIZE);
   preload()
   initSliders()
-  pallete = generatePalette(randomHex())
-  // pallete = ['#389cae', '#cd7565', '#cda965', '#cd6589'] // #E8D5B4 #C270B4 #A771C2 #C2708B
-  console.log(pallete);
+  // pallete = generatePalette(randomHex())
+  pallete = ['#389cae', '#cd7565', '#cda965', '#cd6589'] // #E8D5B4 #C270B4 #A771C2 #C2708B
+  // console.log(pallete);
 }
 
 let time = 0
@@ -92,9 +93,7 @@ function draw() {
 
   stroke(255, 0, 0)
   let fps = frameRate();
-  text(Math.floor(fps), 50, 50);
-
-  // scale(0.2);
+  // text(Math.floor(fps), 50, 50);
 
   for (let y = 0; y < SCREEN_SIZE; y += resolutionSettings.slider.value()) {
     step(sizeSettings.slider.value(), y)
@@ -180,6 +179,19 @@ function zoomAtCenter(factor) {
   translate(-mx, -my);
   translate();
 }
+
+let recorder
+let recording = false
+window.addEventListener('keydown', function (e) {
+  if (e.key === 'r') {
+    recording = !recording
+    if (recording) {
+      recorder = record(chunks)
+    } else {
+      recorder.stop();
+    }
+  }
+})
 
 /*
 When you use type="module" in your HTML script tag, it indicates that the script should be treated as a module. 
