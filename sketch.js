@@ -9,6 +9,7 @@ let multiplierSettings;
 let resolutionSettings;
 let zoomSettings;
 let modeSelect;
+let changeColorsButton;
 let resetButton;
 
 let pallete = []
@@ -63,8 +64,15 @@ function initSliders() {
   modeSelect.changed(() => storeItem('mode', modeSelect.selected()))
   if (!SHOW_MENU) modeSelect.hide()
 
+  changeColorsButton = createButton('Change colors')
+  changeColorsButton.position(20, 1020)
+  changeColorsButton.mousePressed(() => {
+    // pallete = generatePalette(randomHex())
+    pallete = ['#ffffff']
+  })
+
   resetButton = createButton('Reset')
-  resetButton.position(20, 1020)
+  resetButton.position(20, 1040)
   resetButton.mousePressed(() => {
     localStorage.clear()
     location.reload()
@@ -73,22 +81,22 @@ function initSliders() {
 }
 
 function setup() {
+
   createCanvas(windowWidth, windowHeight);
   preload()
   initSliders()
-  // pallete = generatePalette(randomHex())
-  pallete = ['#389cae', '#cd7565', '#cda965', '#cd6589'] // #E8D5B4 #C270B4 #A771C2 #C2708B
-  // console.log(pallete);
+  pallete = ['#389cae', '#cd7565', '#cda965', '#cd6589']
+
 }
 
 
 function draw() {
   zoomAtCenter(zoomSettings.slider.value())
   background(0);
+  stroke(255)
+  // drawPallete()
 
-  stroke(255, 0, 0)
-  let fps = frameRate();
-  // text(Math.floor(fps), 50, 50);
+  // text(Math.floor(frameRate()), 50, 50);
 
   for (let y = 0; y < windowHeight; y += resolutionSettings.slider.value()) {
     step(sizeSettings.slider.value(), y)
@@ -102,49 +110,54 @@ function time() {
   return frameCount * (speedSettings.slider.value() / 10000)
 }
 
-function step(x = 50, y = 50) {
+function step(size = 50, y = 50) {
   const { r, g, b } = hexToRgb(pallete[Math.floor(y) % pallete.length])
-
   fill(r, g, b, alphaSettings.slider.value())
   stroke(r, g, b, alphaSettings.slider.value())
-  // stroke(255, alphaSlider.value())
 
   const mode = modeSelect.selected()
 
   switch (mode) {
     case 'Dots':
-      rect(sin(time() + y) * x + y, y, 1, 1)
+      rect(sin(time() + y) * size + y, y, 1, 1)
       break;
     case 'Tan':
-      // rect(tan(time() + y) * x + y, y, 20, 20)
-      // rect(tan(time() + y) * x + y, y, 1, 1)
-      // rect(tan(time() + y) * x + y, y, 5, 5)
-      // ellipse(tan(time() + y) * x + y, y, 2, 2);
-      // ellipse(tan(time() + y) * x + y, y, 20, 20);
-      // rect(tan(time() + y) * x + y, y, 1, 1000) // long
-      // ellipse(tan(time() + y) * x + y, y, 60, 60);
+      // rect(tan(time() + y) * size + y, y, 20, 20)
+      rect(tan(time() + y) * size + y, y, 1, 1)
+      // rect(tan(time() + y) * size + y, y, 5, 5)
+      // ellipse(tan(time() + y) * size + y, y, 2, 2);
+      // ellipse(tan(time() + y) * size + y, y, 20, 20);
+      // rect(tan(time() + y) * size + y, y, 1, 1000) // long
+      // ellipse(tan(time() + y) * size + y, y, 60, 60);
 
-      // rect(tan(time() + y * multiplierSettings.slider.value()) * x + y, y, 7, 7);
-      rect(tan(time() + y * multiplierSettings.slider.value()) * x + y, y, 7, 7);
-      // rect(tan(time() + y) * x + x, y, 2, 2);
+      // rect(tan(time() + y * multiplierSettings.slider.value()) * size + y, y, 7, 7);
+      // rect(tan(time() + y * multiplierSettings.slider.value()) * size + y, y, 7, 7);
+
+      // symettrical
+      // rect(tan(time() + y) * size + windowWidth / 2, y, 2, 2);
+
+      // rect(cos(time() + y) * size + windowWidth / 2, y, 2, 2);
 
       break;
     case 'Rotation':
       rotate(0.0001)
 
-      circle(tan(time() + y * multiplierSettings.slider.value()) * x + y, y, 50, 50);
+      circle(tan(time() + y * multiplierSettings.slider.value()) * size + y, y, 50, 50);
       break
     case 'Emoji':
-      // image(img, tan(time() + y * multiplierSlider.value()) * x + y, y, 50, 50);
+      // image(img, tan(time() + y * multiplierSlider.value()) * size + y, y, 50, 50);
       const emoji = emojiCache[y] ?? getRandomEmoji(y)
       emojiCache[y] = emoji
-      text(emoji, tan(time() + y * multiplierSettings.slider.value()) * x + y, y)
+      text(emoji, tan(time() + y * multiplierSettings.slider.value()) * size + y, y)
 
       break
     case 'Text':
       const c = textCache[y] ?? getRandomUnicodeCharacter()
       textCache[y] = c
-      text(c, tan(time() + y * multiplierSettings.slider.value()) * x + y, y)
+
+      // textSize(2);
+
+      text('Hello world, Hello world, Hello world', tan(time() + y * multiplierSettings.slider.value()) * size + y, y)
       break
   }
 }
