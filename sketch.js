@@ -2,8 +2,6 @@ import { generatePalette, hexToRgb, randomHex } from './colors.js'
 import { getRandomEmoji, getRandomUnicodeCharacter } from './util.js'
 import { record } from './p5Util.js'
 
-const SCREEN_SIZE = 1000
-
 let sizeSettings;
 let speedSettings;
 let alphaSettings;
@@ -51,7 +49,7 @@ function initSliders() {
   const yMargin = 20
 
   sizeSettings = createSliderWithLabel(0, 1000, 200, 1, 'size', 20, startY);
-  speedSettings = createSliderWithLabel(0.0001, 0.01, 0.0001, 0.0005, 'speed', 20, startY + 1 * yMargin);
+  speedSettings = createSliderWithLabel(1, 200, 1, 10, 'speed', 20, startY + 1 * yMargin);
   alphaSettings = createSliderWithLabel(0, 255, 255, 1, 'alpha', 20, startY + 2 * yMargin);
   multiplierSettings = createSliderWithLabel(1, 1000, 1, 1, 'multiplier', 20, startY + 3 * yMargin);
   resolutionSettings = createSliderWithLabel(0.01, 1, 0.1, 0.01, 'resolution', 20, startY + 4 * yMargin);
@@ -72,19 +70,16 @@ function initSliders() {
     location.reload()
   })
   if (!SHOW_MENU) resetButton.hide()
-
 }
 
 function setup() {
-  createCanvas(SCREEN_SIZE, SCREEN_SIZE);
+  createCanvas(windowWidth, windowHeight);
   preload()
   initSliders()
   // pallete = generatePalette(randomHex())
   pallete = ['#389cae', '#cd7565', '#cda965', '#cd6589'] // #E8D5B4 #C270B4 #A771C2 #C2708B
   // console.log(pallete);
 }
-
-let time = 0
 
 
 function draw() {
@@ -95,15 +90,17 @@ function draw() {
   let fps = frameRate();
   // text(Math.floor(fps), 50, 50);
 
-  for (let y = 0; y < SCREEN_SIZE; y += resolutionSettings.slider.value()) {
+  for (let y = 0; y < windowHeight; y += resolutionSettings.slider.value()) {
     step(sizeSettings.slider.value(), y)
   }
-
-  time += speedSettings.slider.value()
 }
 
 const emojiCache = {}
 const textCache = {}
+
+function time() {
+  return frameCount * (speedSettings.slider.value() / 10000)
+}
 
 function step(x = 50, y = 50) {
   const { r, g, b } = hexToRgb(pallete[Math.floor(y) % pallete.length])
@@ -116,38 +113,38 @@ function step(x = 50, y = 50) {
 
   switch (mode) {
     case 'Dots':
-      rect(sin(time + y) * x + y, y, 1, 1)
+      rect(sin(time() + y) * x + y, y, 1, 1)
       break;
     case 'Tan':
-      // rect(tan(time + y) * x + y, y, 20, 20)
-      // rect(tan(time + y) * x + y, y, 1, 1)
-      // rect(tan(time + y) * x + y, y, 5, 5)
-      // ellipse(tan(time + y) * x + y, y, 2, 2);
-      // ellipse(tan(time + y) * x + y, y, 20, 20);
-      // rect(tan(time + y) * x + y, y, 1, 1000) // long
-      // ellipse(tan(time + y) * x + y, y, 60, 60);
+      // rect(tan(time() + y) * x + y, y, 20, 20)
+      // rect(tan(time() + y) * x + y, y, 1, 1)
+      // rect(tan(time() + y) * x + y, y, 5, 5)
+      // ellipse(tan(time() + y) * x + y, y, 2, 2);
+      // ellipse(tan(time() + y) * x + y, y, 20, 20);
+      // rect(tan(time() + y) * x + y, y, 1, 1000) // long
+      // ellipse(tan(time() + y) * x + y, y, 60, 60);
 
-      // rect(tan(time + y * multiplierSettings.slider.value()) * x + y, y, 7, 7);
-      rect(tan(time + y * multiplierSettings.slider.value()) * x + y, y, 7, 7);
-      // rect(tan(time + y) * x + x, y, 2, 2);
+      // rect(tan(time() + y * multiplierSettings.slider.value()) * x + y, y, 7, 7);
+      rect(tan(time() + y * multiplierSettings.slider.value()) * x + y, y, 7, 7);
+      // rect(tan(time() + y) * x + x, y, 2, 2);
 
       break;
     case 'Rotation':
       rotate(0.0001)
 
-      circle(tan(time + y * multiplierSettings.slider.value()) * x + y, y, 50, 50);
+      circle(tan(time() + y * multiplierSettings.slider.value()) * x + y, y, 50, 50);
       break
     case 'Emoji':
-      // image(img, tan(time + y * multiplierSlider.value()) * x + y, y, 50, 50);
+      // image(img, tan(time() + y * multiplierSlider.value()) * x + y, y, 50, 50);
       const emoji = emojiCache[y] ?? getRandomEmoji(y)
       emojiCache[y] = emoji
-      text(emoji, tan(time + y * multiplierSettings.slider.value()) * x + y, y)
+      text(emoji, tan(time() + y * multiplierSettings.slider.value()) * x + y, y)
 
       break
     case 'Text':
       const c = textCache[y] ?? getRandomUnicodeCharacter()
       textCache[y] = c
-      text(c, tan(time + y * multiplierSettings.slider.value()) * x + y, y)
+      text(c, tan(time() + y * multiplierSettings.slider.value()) * x + y, y)
       break
   }
 }
@@ -159,7 +156,7 @@ function drawPallete() {
 
     noStroke()
     fill(r, g, b)
-    rect(SCREEN_SIZE / 2 + i * 100, 100, 100, 100)
+    rect(windowHeight / 2 + i * 100, 100, 100, 100)
   }
 }
 
@@ -171,8 +168,8 @@ function preload() {
 }
 
 function zoomAtCenter(factor) {
-  const mx = SCREEN_SIZE / 2;
-  const my = SCREEN_SIZE / 2;
+  const mx = windowWidth / 2;
+  const my = windowHeight / 2;
 
   translate(mx, my);
   scale(factor);
@@ -200,4 +197,3 @@ To fix this we can manaully add them to window obj.
 */
 window.setup = setup;
 window.draw = draw;
-

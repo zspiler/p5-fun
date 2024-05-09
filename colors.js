@@ -1,6 +1,3 @@
-
-
-
 function getComplementaryColor(color) {
     const MIN_LIGHTNESS = 0.6;
 
