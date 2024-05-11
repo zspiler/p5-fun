@@ -12,6 +12,8 @@ let modeSelect;
 let changeColorsButton;
 let resetButton;
 let textInput;
+let sizeSettings;
+let rotationSettings;
 
 let pallete = []
 let chunks = [] // for recording
@@ -19,8 +21,7 @@ let chunks = [] // for recording
 let SHOW_MENU = true
 
 const modes = {
-  Tan: 'Tan',
-  Rotation: 'Rotation',
+  Circle: 'Circle',
   Emoji: 'Emoji',
   Text: 'Text',
 }
@@ -51,17 +52,12 @@ function initSliders() {
 
   shapeSettings = createSliderWithLabel(0, 1000, 200, 1, 'shape', 20, startY);
   speedSettings = createSliderWithLabel(1, 200, 1, 10, 'speed', 20, startY + 1 * yMargin);
-  alphaSettings = createSliderWithLabel(0, 255, 255, 1, 'alpha', 20, startY + 2 * yMargin);
-  multiplierSettings = createSliderWithLabel(1, 1000, 1, 1, 'multiplier', 20, startY + 3 * yMargin);
+  multiplierSettings = createSliderWithLabel(1, 1000, 1, 1, 'multiplier', 20, startY + 2 * yMargin);
+  rotationSettings = createSliderWithLabel(0, 0.00001 * 100, 0, 0.00001, 'rotation', 20, startY + 3 * yMargin);
   resolutionSettings = createSliderWithLabel(0.01, 1, 0.1, 0.01, 'resolution', 20, startY + 4 * yMargin);
   zoomSettings = createSliderWithLabel(0.1, 10, 1, 0.001, 'zoom', 20, startY + 5 * yMargin);
-
-  textInput = createInput(getItem('text') ?? 'Duo moralna macka')
-  textInput.elt.placeholder = 'Enter text'
-  textInput.position(20, startY + 7 * yMargin)
-  textInput.input(() => {
-    storeItem('text', textInput.value());
-  })
+  sizeSettings = createSliderWithLabel(1, 100, 1, 1, 'size', 20, startY + 6 * yMargin);
+  alphaSettings = createSliderWithLabel(0, 255, 255, 1, 'alpha', 20, startY + 7 * yMargin);
 
   const modeSelectDefault = modes.Tan
   modeSelect = createSelect();
@@ -71,10 +67,17 @@ function initSliders() {
   modeSelect.changed(() => storeItem('mode', modeSelect.selected()))
   if (!SHOW_MENU) modeSelect.hide()
 
+  textInput = createInput(getItem('text') ?? 'Duo moralna macka')
+  textInput.elt.placeholder = 'Enter text'
+  textInput.elt.minlength = 1
+  textInput.position(modeSelect.x + modeSelect.elt.getBoundingClientRect().width + 10, modeSelect.elt.getBoundingClientRect().y)
+  textInput.hide()
+
   changeColorsButton = createButton('Change colors')
   changeColorsButton.position(20, 1020)
   changeColorsButton.mousePressed(() => {
     pallete = [randomHex(), randomHex(), randomHex(), randomHex()]
+    storeItem('pallete', pallete)
   })
 
   resetButton = createButton('Reset')
@@ -90,7 +93,7 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   preload()
   initSliders()
-  pallete = ['#389cae', '#cd7565', '#cda965', '#cd6589']
+  pallete = getItem('pallete') ?? ['#389cae', '#cd7565', '#cda965', '#cd6589']
 }
 
 
@@ -99,10 +102,7 @@ function draw() {
   background(0);
   stroke(255)
 
-  // inputs
-  textInput.hide()
-  multiplierSettings.slider.elt.disabled = true
-
+  // debug
   // drawPallete()
   // text(Math.floor(frameRate()), 50, 50);
 
@@ -126,40 +126,27 @@ function step(shape = 50, y = 50) {
   const mode = modeSelect.selected()
 
   switch (mode) {
-    case 'Tan':
-      // rect(tan(time() + y) * shape + y, y, 20, 20)
-      // rect(tan(time() + y) * shape + y, y, 1, 1) // !!!!
-      // ellipse(tan(time() + y) * shape + y, y, 20, 20);
-      // ellipse(tan(time() + y) * shape + y, y, 60, 60);
-
-      /// multiplier
-      // rect(tan(time() + y * multiplierSettings.slider.value()) * shape + y, y, 7, 7);
-      // symettrical
-      // rect(tan(time() + y) * shape + windowWidth / 2, y, 2, 2);
-      // rect(cos(time() + y) * shape + windowWidth / 2, y, 2, 2);
-
-      multiplierSettings.slider.elt.disabled = true
-      rect(tan(time() + y) * shape + y, y, 1, 1)
-
+    case 'Circle':
+      circle(tan(time() + y * multiplierSettings.slider.value()) * shape + y, y, sizeSettings.slider.value());
+      rotate(rotationSettings.slider.value()) // NOTE: makes text & emoji slow
+      rotationSettings.slider.elt.disabled = false
       break;
-    case 'Rotation':
-      rotate(0.00001)
-
-      circle(tan(time() + y * multiplierSettings.slider.value()) * shape + y, y, 50, 50);
-      break
     case 'Emoji':
       // image(img, tan(time() + y * multiplierSlider.value()) * shape + y, y, 50, 50);
       const emoji = emojiCache[y] ?? getRandomEmoji(y)
       emojiCache[y] = emoji
       text(emoji, tan(time() + y * multiplierSettings.slider.value()) * shape + y, y)
 
+      rotationSettings.slider.elt.disabled = true
       break
     case 'Text':
       textInput.show()
+
       // const c = textCache[y] ?? getRandomUnicodeCharacter()
       // textCache[y] = c
-
       text(textInput.value(), tan(time() + y * multiplierSettings.slider.value()) * shape + y, y)
+
+      rotationSettings.slider.elt.disabled = true
       break
   }
 }
