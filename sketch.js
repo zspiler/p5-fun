@@ -2,7 +2,7 @@ import { generatePalette, hexToRgb, randomHex } from './colors.js'
 import { getRandomEmoji, getRandomUnicodeCharacter } from './util.js'
 import { record } from './p5Util.js'
 
-let sizeSettings;
+let shapeSettings;
 let speedSettings;
 let alphaSettings;
 let multiplierSettings;
@@ -11,6 +11,7 @@ let zoomSettings;
 let modeSelect;
 let changeColorsButton;
 let resetButton;
+let textInput;
 
 let pallete = []
 let chunks = [] // for recording
@@ -18,7 +19,6 @@ let chunks = [] // for recording
 let SHOW_MENU = true
 
 const modes = {
-  Dots: 'Dots',
   Tan: 'Tan',
   Rotation: 'Rotation',
   Emoji: 'Emoji',
@@ -27,7 +27,7 @@ const modes = {
 
 function createSliderWithLabel(min, max, defaultValue, step, labelPrefix, xPos, yPos) {
   const slider = createSlider(min, max, getItem(labelPrefix) ?? defaultValue, step);
-  slider.changed(() => {
+  slider.input(() => {
     storeItem(labelPrefix, slider.value());
     label.html(`${labelPrefix.toUpperCase()} ${slider.value()}`);
   });
@@ -49,16 +49,23 @@ function initSliders() {
   const startY = 800
   const yMargin = 20
 
-  sizeSettings = createSliderWithLabel(0, 1000, 200, 1, 'size', 20, startY);
+  shapeSettings = createSliderWithLabel(0, 1000, 200, 1, 'shape', 20, startY);
   speedSettings = createSliderWithLabel(1, 200, 1, 10, 'speed', 20, startY + 1 * yMargin);
   alphaSettings = createSliderWithLabel(0, 255, 255, 1, 'alpha', 20, startY + 2 * yMargin);
   multiplierSettings = createSliderWithLabel(1, 1000, 1, 1, 'multiplier', 20, startY + 3 * yMargin);
   resolutionSettings = createSliderWithLabel(0.01, 1, 0.1, 0.01, 'resolution', 20, startY + 4 * yMargin);
   zoomSettings = createSliderWithLabel(0.1, 10, 1, 0.001, 'zoom', 20, startY + 5 * yMargin);
 
+  textInput = createInput(getItem('text') ?? 'Duo moralna macka')
+  textInput.elt.placeholder = 'Enter text'
+  textInput.position(20, startY + 7 * yMargin)
+  textInput.input(() => {
+    storeItem('text', textInput.value());
+  })
+
   const modeSelectDefault = modes.Tan
   modeSelect = createSelect();
-  modeSelect.position(20, 1000);
+  modeSelect.position(20, startY - yMargin);
   Object.keys(modes).forEach(mo => modeSelect.option(mo))
   modeSelect.selected(getItem('mode') ?? modeSelectDefault);
   modeSelect.changed(() => storeItem('mode', modeSelect.selected()))
@@ -67,8 +74,7 @@ function initSliders() {
   changeColorsButton = createButton('Change colors')
   changeColorsButton.position(20, 1020)
   changeColorsButton.mousePressed(() => {
-    // pallete = generatePalette(randomHex())
-    pallete = ['#ffffff']
+    pallete = [randomHex(), randomHex(), randomHex(), randomHex()]
   })
 
   resetButton = createButton('Reset')
@@ -81,12 +87,10 @@ function initSliders() {
 }
 
 function setup() {
-
   createCanvas(windowWidth, windowHeight);
   preload()
   initSliders()
   pallete = ['#389cae', '#cd7565', '#cda965', '#cd6589']
-
 }
 
 
@@ -94,23 +98,27 @@ function draw() {
   zoomAtCenter(zoomSettings.slider.value())
   background(0);
   stroke(255)
-  // drawPallete()
 
+  // inputs
+  textInput.hide()
+  multiplierSettings.slider.elt.disabled = true
+
+  // drawPallete()
   // text(Math.floor(frameRate()), 50, 50);
 
   for (let y = 0; y < windowHeight; y += resolutionSettings.slider.value()) {
-    step(sizeSettings.slider.value(), y)
+    step(shapeSettings.slider.value(), y)
   }
 }
 
 const emojiCache = {}
-const textCache = {}
 
 function time() {
   return frameCount * (speedSettings.slider.value() / 10000)
 }
 
-function step(size = 50, y = 50) {
+function step(shape = 50, y = 50) {
+  // console.log(Math.floor(y) % pallete.length);
   const { r, g, b } = hexToRgb(pallete[Math.floor(y) % pallete.length])
   fill(r, g, b, alphaSettings.slider.value())
   stroke(r, g, b, alphaSettings.slider.value())
@@ -118,46 +126,40 @@ function step(size = 50, y = 50) {
   const mode = modeSelect.selected()
 
   switch (mode) {
-    case 'Dots':
-      rect(sin(time() + y) * size + y, y, 1, 1)
-      break;
     case 'Tan':
-      // rect(tan(time() + y) * size + y, y, 20, 20)
-      rect(tan(time() + y) * size + y, y, 1, 1)
-      // rect(tan(time() + y) * size + y, y, 5, 5)
-      // ellipse(tan(time() + y) * size + y, y, 2, 2);
-      // ellipse(tan(time() + y) * size + y, y, 20, 20);
-      // rect(tan(time() + y) * size + y, y, 1, 1000) // long
-      // ellipse(tan(time() + y) * size + y, y, 60, 60);
+      // rect(tan(time() + y) * shape + y, y, 20, 20)
+      // rect(tan(time() + y) * shape + y, y, 1, 1) // !!!!
+      // ellipse(tan(time() + y) * shape + y, y, 20, 20);
+      // ellipse(tan(time() + y) * shape + y, y, 60, 60);
 
-      // rect(tan(time() + y * multiplierSettings.slider.value()) * size + y, y, 7, 7);
-      // rect(tan(time() + y * multiplierSettings.slider.value()) * size + y, y, 7, 7);
-
+      /// multiplier
+      // rect(tan(time() + y * multiplierSettings.slider.value()) * shape + y, y, 7, 7);
       // symettrical
-      // rect(tan(time() + y) * size + windowWidth / 2, y, 2, 2);
+      // rect(tan(time() + y) * shape + windowWidth / 2, y, 2, 2);
+      // rect(cos(time() + y) * shape + windowWidth / 2, y, 2, 2);
 
-      // rect(cos(time() + y) * size + windowWidth / 2, y, 2, 2);
+      multiplierSettings.slider.elt.disabled = true
+      rect(tan(time() + y) * shape + y, y, 1, 1)
 
       break;
     case 'Rotation':
-      rotate(0.0001)
+      rotate(0.00001)
 
-      circle(tan(time() + y * multiplierSettings.slider.value()) * size + y, y, 50, 50);
+      circle(tan(time() + y * multiplierSettings.slider.value()) * shape + y, y, 50, 50);
       break
     case 'Emoji':
-      // image(img, tan(time() + y * multiplierSlider.value()) * size + y, y, 50, 50);
+      // image(img, tan(time() + y * multiplierSlider.value()) * shape + y, y, 50, 50);
       const emoji = emojiCache[y] ?? getRandomEmoji(y)
       emojiCache[y] = emoji
-      text(emoji, tan(time() + y * multiplierSettings.slider.value()) * size + y, y)
+      text(emoji, tan(time() + y * multiplierSettings.slider.value()) * shape + y, y)
 
       break
     case 'Text':
-      const c = textCache[y] ?? getRandomUnicodeCharacter()
-      textCache[y] = c
+      textInput.show()
+      // const c = textCache[y] ?? getRandomUnicodeCharacter()
+      // textCache[y] = c
 
-      // textSize(2);
-
-      text('Hello world, Hello world, Hello world', tan(time() + y * multiplierSettings.slider.value()) * size + y, y)
+      text(textInput.value(), tan(time() + y * multiplierSettings.slider.value()) * shape + y, y)
       break
   }
 }

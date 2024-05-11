@@ -18,12 +18,18 @@ function getAnalogousColors(color) {
 
     let hue1 = (hsl.h + 30) % 360;
     let hue2 = (hsl.h - 30 + 360) % 360;
+    let hue3 = (hsl.h + 60) % 360;
+    let hue4 = (hsl.h - 60 + 360) % 360;
 
     let rgb1 = hslToRGB({ h: hue1, s: hsl.s, l: Math.max(hsl.l, MIN_LIGHTNESS) });
     let rgb2 = hslToRGB({ h: hue2, s: hsl.s, l: Math.max(hsl.l, MIN_LIGHTNESS) });
+    let rgb3 = hslToRGB({ h: hue3, s: hsl.s, l: Math.max(hsl.l, MIN_LIGHTNESS) });
+    let rgb4 = hslToRGB({ h: hue4, s: hsl.s, l: Math.max(hsl.l, MIN_LIGHTNESS) });
 
     analogousColors.push(rgbToHex(rgb1));
     analogousColors.push(rgbToHex(rgb2));
+    analogousColors.push(rgbToHex(rgb3));
+    analogousColors.push(rgbToHex(rgb4));
 
     return analogousColors;
 }
