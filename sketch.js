@@ -63,7 +63,18 @@ const presets = [
     "size": 23,
     "alpha": 249,
     mode: modes.Text
-  }
+  },
+  {
+    "name": "candy",
+    "shape": 513,
+    "speed": 20,
+    "multiplier": 177,
+    "resolution": 0.1,
+    "zoom": 1,
+    "size": 136,
+    "alpha": 255,
+    "mode": "Circle"
+  },
 ]
 
 function createSliderWithLabel(min, max, defaultValue, step, labelPrefix, xPos, yPos) {
