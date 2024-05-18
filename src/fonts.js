@@ -1,11 +1,13 @@
 let pts;
 let caslon;
+let startTime
 
 function preload() {
     caslon = loadFont('../assets/fonts/jabolka.otf');
 }
 
 function setup() {
+    startTime = millis()
     createCanvas(windowWidth, windowHeight);
 }
 
@@ -62,7 +64,7 @@ function trubar() {
 }
 
 function candy() {
-    const pts = caslon.textToPoints('c a n d y', 0, 0, 200, { sampleFactor: 0.4 });
+    const pts = caslon.textToPoints('candy', 0, 0, 200, { sampleFactor: 0.4 });
 
     for (let i = 0; i < pts.length; i++) {
         noStroke()
@@ -125,27 +127,63 @@ function rotations() {
     }
 }
 
+// function assembly() {
+//     const pts = caslon.textToPoints('assemble!', 0, 0, 200, { sampleFactor: 0.4, });
 
-// TODO curve?
+//     noFill()
+//     stroke(20, 0, 255)
+
+//     const offsets = pts.map(p => {
+//         const rng = new Math.seedrandom(p.x + p.y);
+//         return { x: rng() * 10, y: rng() * 10 }
+//     })
+
+//     for (let i = 0; i < pts.length; i++) {
+//         const offset = offsets[i];
+
+//         const time = frameCount
+//         rect(pts[i].x + (50 / time) * offset.x, pts[i].y + (50 / time) * offset.y, 3, 3)
+//     }
+// }
+
+
+// // NOTE: meh kinda OK curve?
 function assembly() {
-    const pts = caslon.textToPoints('assemble!', 0, 0, 200, { sampleFactor: 0.4, });
+    const pts = caslon.textToPoints('assemble!', 0, 0, 200, { sampleFactor: 0.4 });
 
-    noFill()
-    stroke(20, 0, 255)
+    noFill();
+    stroke(20, 0, 255);
 
     const offsets = pts.map(p => {
         const rng = new Math.seedrandom(p.x + p.y);
-        return { x: rng() * 10, y: rng() * 10 }
-    })
+        return { x: rng() * 10, y: rng() * 10 };
+    });
+
+    const elapsedTime = millis() - startTime;
+
+    const duration = 4000
+
+    const t = min(elapsedTime / duration, 1);
+    const timeFactor = pow(1 - t, 4) * 100;
 
     for (let i = 0; i < pts.length; i++) {
         const offset = offsets[i];
 
-        // const time = frameCount / sin(frameCount / 4);
-        const time = frameCount / 10
-        rect(pts[i].x + (50 / time) * offset.x, pts[i].y + (50 / time) * offset.y, 3, 3)
+        rect(
+            pts[i].x + offset.x * timeFactor,
+            pts[i].y + offset.y * timeFactor,
+            3, 3
+        );
     }
 }
+
+/*
+Ideas
+- multi overlaid / layers
+- slow writing (one point at time?)
+- util for seperate leters?
+- randomness around points?
+*/
 
 
 function draw() {
