@@ -6,10 +6,9 @@ function preload() {
 }
 
 function setup() {
-    // preload()
     createCanvas(windowWidth, windowHeight);
 
-    pts = caslon.textToPoints('a b c d',
+    pts = caslon.textToPoints('blonde',
         0, // x
         0, // y
         200, // fontSize
@@ -26,18 +25,23 @@ ideas
 make N points on screen (random), make them slowly move to position on text
 */
 
-function draw() {
+function blonde() {
     background(220);
 
     translate(windowWidth / 2, windowHeight / 2);
     fill(255, 0, 0);
-    noStroke();
+    // noStroke();
 
     for (let i = 0; i < pts.length; i++) {
         // fill(i % 255);
         // ellipse(pts[i].x, pts[i].y, 3, 3);
-        rect(pts[i].x, pts[i].y, 8, 8);
+        // rect(pts[i].x, pts[i].y, 50, 2);
+        rect(pts[i].x, pts[i].y, 50, 50);
     }
+}
+
+function draw() {
+    blonde()
 
     // translate(0, 100);
     // beginShape(POINTS);
@@ -67,8 +71,6 @@ function draw() {
     // }
 
 }
-
-
 
 
 window.preload = preload;
