@@ -1,6 +1,6 @@
-import { generatePalette, hexToRgb, randomHex } from './colors.js'
-import { getRandomEmoji, getRandomUnicodeCharacter } from './util.js'
-import { record } from './p5Util.js'
+import { hexToRgb } from './utils/colors.js'
+import { getRandomEmoji } from './utils/util.js'
+import { record } from './utils/p5Util.js'
 
 const defaultPallete = ['#389cae', '#cd7565', '#cda965', '#cd6589']
 
@@ -276,7 +276,7 @@ let img;
 
 // Load the image.
 function preload() {
-  img = loadImage('assets/emoji.webp');
+  img = loadImage('../../assets/emoji.webp');
 }
 
 function zoomAtCenter(factor) {
