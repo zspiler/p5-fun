@@ -15,7 +15,7 @@ function createLines(lineTexts) {
     return lineTexts.map((text, i) => {
         const x = -500
         const y = i * 25
-        const pts = caslon.textToPoints(text, x, y, 35, { sampleFactor: 0.5 });
+        const pts = caslon.textToPoints(text, x, y, 100, { sampleFactor: 0.5 });
         const offsets = createOffsets(pts)
         return {
             text,

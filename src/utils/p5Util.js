@@ -26,7 +26,7 @@ function exportVideo(chunks) {
 export function record(chunks, framerate = 60) {
     chunks.length = 0;
     let stream = document.querySelector('canvas').captureStream(framerate);
-    const bitrate = 500000000;
+    const bitrate = 50000000;
     const recorder = new MediaRecorder(stream, {
         mimeType: 'video/webm; codecs=vp9',
         videoBitsPerSecond: bitrate
